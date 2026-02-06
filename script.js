@@ -72,7 +72,14 @@ noBtn.addEventListener("touchstart", moveNoButton);
 
 // Yes button click
 yesBtn.addEventListener("click", () => {
-  message.innerHTML = "YAYYYY!! 💕🥰 I knew you’d say yes!";
+  const rect = yesBtn.getBoundingClientRect();
+  explodeHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+  message.innerHTML = `
+  <div class="floating-hearts">💖 💕 💗 💞 💓</div>
+  <div>YAYYYY!! 💕🥰 I knew you’d say yes!</div>
+`;
+
   yesBtn.style.display = "none";
   noBtn.style.display = "none";
 });
@@ -83,6 +90,7 @@ let trappedTimer = null;
 let isTrapped = false;
 
 // Emojis/text
+const originalNoText = noBtn.innerHTML;
 const trappedYesText = "YES 😛"; // special trapped yes
 const regularYesText = yesBtn.innerHTML; // original yes text
 
@@ -109,7 +117,7 @@ function cancelTrappedTimer() {
   // If button was trapped but now moving away, revert to No
   if (isTrapped) {
     isTrapped = false;
-    noBtn.innerHTML = "NO"; // original text
+    noBtn.innerHTML = originalNoText; // original text
     noBtn.style.background = ""; // reset styles
     noBtn.style.color = "";
     noBtn.style.border = "";
@@ -128,8 +136,36 @@ noBtn.addEventListener("touchend", cancelTrappedTimer);
 // Optional: if you want clicking trapped No to act like Yes
 noBtn.addEventListener("click", () => {
   if (isTrapped) {
+    const rect = noBtn.getBoundingClientRect();
+    explodeHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
     message.innerHTML = "WOW 😛 You got me! 💕";
     yesBtn.style.display = "none";
     noBtn.style.display = "none";
   }
 });
+
+function explodeHearts(x, y) {
+  const colors = ["#ff4d6d", "#ff758f", "#ffd6e0", "#ff8fab"];
+
+  for (let i = 0; i < 35; i++) {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.style.backgroundColor =
+      colors[Math.floor(Math.random() * colors.length)];
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 140 + 40;
+
+    heart.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
+    heart.style.setProperty("--y", `${Math.sin(angle) * distance}px`);
+
+    heart.style.left = `${x}px`;
+    heart.style.top = `${y}px`;
+
+    document.body.appendChild(heart);
+
+    setTimeout(() => heart.remove(), 1200);
+  }
+}
+
